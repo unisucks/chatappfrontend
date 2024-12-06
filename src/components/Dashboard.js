@@ -1,16 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Box, Typography, TextField, Button, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Message from "./Message";
 import Conversation from "./Conversation";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import io from "socket.io-client";
 
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [socket, setSocket] = useState(null);
+  const sender = JSON.parse(localStorage.getItem("chat-user"));
+
+  useEffect(() => {
+    if (sender) {
+      const socket = io("http://localhost:3005", {
+        query: {
+          userId: sender._id,
+        },
+      });
+      setSocket(socket);
+      // Listen for incoming messages
+      socket.on("newMessage", (newMessage) => {
+        // Use functional update to ensure state is updated correctly
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+
+      return () => socket.close();
+    } else {
+      if (socket) {
+        socket.close();
+        setSocket(null);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const getConversations = async () => {
@@ -30,7 +56,7 @@ const Dashboard = () => {
       }
     };
     getConversations();
-  }, []);
+  }, [users]);
   const navigate = useNavigate();
   const logout = (e) => {
     e.preventDefault();
@@ -53,7 +79,7 @@ const Dashboard = () => {
       if (!res.ok) {
         throw new Error(data.error || "Failed to fetch messages");
       }
-      setMessages(data); // Set messages for the selected conversation
+      setMessages(data);
     } catch (error) {
       toast.error(error.message);
     }
@@ -78,8 +104,14 @@ const Dashboard = () => {
       }
       setMessages((prevMessages) => [...prevMessages, data]);
       setNewMessage("");
+      socket.emit("newMessage", data);
     } catch (error) {
       toast.error(error.message);
+    }
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      sendMessage(); // Send message when Enter is pressed
     }
   };
   return (
@@ -125,6 +157,20 @@ const Dashboard = () => {
               ),
             }}
           /> */}
+          {/* Display online users
+          <Box sx={{ marginBottom: "16px" }}>
+            <Typography variant="h6" sx={{ marginBottom: "8px" }}>
+              Online Users
+            </Typography>
+            {onlineUsers.map((userId) => {
+              const user = users.find((user) => user._id === userId);
+              return user ? (
+                <Box key={user._id} sx={{ marginBottom: "8px" }}>
+                  {user.name} <span style={{ color: "green" }}>•</span>
+                </Box>
+              ) : null;
+            })}
+          </Box> */}
 
           <Box sx={{ flex: 1, overflowY: "auto", marginBottom: "16px" }}>
             <Typography variant="h6" sx={{ marginBottom: "8px" }}>
@@ -180,6 +226,7 @@ const Dashboard = () => {
                   fullWidth
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
                 <Button
                   variant="contained"

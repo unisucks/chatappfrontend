@@ -7,7 +7,7 @@ const Conversation = ({ user, onUserClick }) => {
       {user.map((user, index) => (
         <Box>
           <Box
-            key={index}
+            key={user._id}
             sx={{
               display: "flex",
               justifyContent: "space-between",
