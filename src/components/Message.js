@@ -1,14 +1,13 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Avatar } from "@mui/material";
 
 const Message = ({ message }) => {
   const currentUser = JSON.parse(localStorage.getItem("chat-user"));
-  const messagesEndRef = useRef(null); // Reference to the bottom of the messages container
-  // Scroll to the bottom whenever new messages are added
+
+  const messagesEndRef = useRef(null);
   useEffect(() => {
-    // Scroll to the end of the messages container
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [message]); // Re-run this effect when `message` changes
+  }, [message]);
   return (
     <>
       {message.map((msg, index) => (
@@ -16,6 +15,7 @@ const Message = ({ message }) => {
           key={index}
           sx={{
             mb: "16px",
+            textAlign: "left",
             alignSelf:
               msg.senderId != currentUser._id ? "flex-start" : "flex-end",
             maxWidth: "70%",
@@ -29,6 +29,14 @@ const Message = ({ message }) => {
             boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
           }}
         >
+          {/* <img
+            src={
+              msg.senderId === currentUser._id
+                ? currentUser.profilePic
+                : msg.profilePic
+            }
+            sx={{ width: 30, height: 30, margin: "0 8px" }}
+          /> */}
           <Typography variant="body2">{msg.message}</Typography>
           <Typography
             variant="caption"

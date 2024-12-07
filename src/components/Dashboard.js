@@ -17,7 +17,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (sender) {
-      const socket = io("http://localhost:3005", {
+      const socket = io("http://192.168.0.49:3005", {
         query: {
           userId: sender._id,
         },
@@ -56,7 +56,7 @@ const Dashboard = () => {
       }
     };
     getConversations();
-  }, [users]);
+  }, []);
   const navigate = useNavigate();
   const logout = (e) => {
     e.preventDefault();
@@ -173,7 +173,10 @@ const Dashboard = () => {
           </Box> */}
 
           <Box sx={{ flex: 1, overflowY: "auto", marginBottom: "16px" }}>
-            <Typography variant="h6" sx={{ marginBottom: "8px" }}>
+            <Typography
+              variant="h5"
+              sx={{ marginBottom: "8px", fontWeight: 600 }}
+            >
               Conversations
             </Typography>
             <Conversation
@@ -197,8 +200,11 @@ const Dashboard = () => {
         >
           {selectedUser ? (
             <>
-              <Typography variant="h6" sx={{ marginBottom: "16px" }}>
-                To {selectedUser.name}
+              <Typography
+                variant="h5"
+                sx={{ fontweight: 600, marginBottom: "16px" }}
+              >
+                Chat With {selectedUser.name}
               </Typography>
 
               <Box

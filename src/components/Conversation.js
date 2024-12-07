@@ -10,9 +10,12 @@ const Conversation = ({ user, onUserClick }) => {
             key={user._id}
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: 500,
+              justifyContent: "center",
               mb: "8px",
               p: "16px",
+              gap: "50px",
               backgroundColor: "white",
               borderRadius: "8px",
               transition: "background-color 0.3s ease",
@@ -22,8 +25,8 @@ const Conversation = ({ user, onUserClick }) => {
             }}
             onClick={() => onUserClick(user)}
           >
-            {user.name}
             <img src={user.profilePic} width="30px" height="30px"></img>
+            {user.name}
           </Box>
           <Divider />
         </Box>
