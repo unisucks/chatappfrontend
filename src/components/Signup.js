@@ -63,12 +63,15 @@ const Signup = () => {
           validationSchema={validation}
           onSubmit={async (values, { resetForm }) => {
             try {
-              const res = await fetch("http://localhost:3005/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(values),
-                credentials: "include",
-              });
+              const res = await fetch(
+                "https://chatappbackend-mocha.vercel.app/auth/register",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(values),
+                  credentials: "include",
+                }
+              );
               const data = await res.json();
               if (data.error) {
                 throw new Error(data.error);

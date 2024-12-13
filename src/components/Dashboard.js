@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (sender) {
-      const socket = io("http://localhost:3005", {
+      const socket = io("https://chatappbackend-mocha.vercel.app/", {
         query: {
           userId: sender._id,
         },
@@ -48,11 +48,16 @@ const Dashboard = () => {
   useEffect(() => {
     const getConversations = async () => {
       try {
-        const res = await fetch("http://localhost:3005/users", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        });
+        const res = await fetch(
+          "https://chatappbackend-mocha.vercel.app/users",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
         if (!res.ok) {
           throw new Error("Failed to fetch users");
         }
@@ -68,10 +73,13 @@ const Dashboard = () => {
   }, []);
   const logout = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:3005/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    const res = await fetch(
+      "https://chatappbackend-mocha.vercel.app/auth/logout",
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
     const data = await res.json();
     if (data.error) {
       throw new Error(data.error);
@@ -84,13 +92,16 @@ const Dashboard = () => {
 
     // Fetch messages for the selected user
     try {
-      const res = await fetch(`http://localhost:3005/messages/${user._id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const res = await fetch(
+        `https://chatappbackend-mocha.vercel.app/messages/${user._id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Failed to fetch messages");
@@ -104,7 +115,7 @@ const Dashboard = () => {
     if (!newMessage.trim()) return;
     try {
       const res = await fetch(
-        `http://localhost:3005/messages/send/${selectedUser._id}`,
+        `https://chatappbackend-mocha.vercel.app/messages/send/${selectedUser._id}`,
         {
           method: "POST",
           headers: {
