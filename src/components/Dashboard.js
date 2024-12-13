@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, TextField, Button, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Message from "./Message";
 import Conversation from "./Conversation";
-import { isCookie, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import io from "socket.io-client";
 
@@ -14,6 +14,11 @@ const Dashboard = () => {
   const [newMessage, setNewMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const sender = JSON.parse(localStorage.getItem("chat-user"));
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const originalUsers = useRef(users);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     if (sender) {
@@ -28,7 +33,9 @@ const Dashboard = () => {
         // Use functional update to ensure state is updated correctly
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
-
+      socket.on("getOnlineUsers", (users) => {
+        setOnlineUsers(users);
+      });
       return () => socket.close();
     } else {
       if (socket) {
@@ -51,6 +58,7 @@ const Dashboard = () => {
         }
         const data = await res.json();
         setUsers(data);
+        originalUsers.current = data;
       } catch (error) {
         alert("Error in Getting Users", error.message);
         navigate("/");
@@ -58,7 +66,6 @@ const Dashboard = () => {
     };
     getConversations();
   }, []);
-  const navigate = useNavigate();
   const logout = async (e) => {
     e.preventDefault();
     const res = await fetch("http://localhost:3005/auth/logout", {
@@ -118,9 +125,27 @@ const Dashboard = () => {
       toast.error(error.message);
     }
   };
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
       sendMessage(); // Send message when Enter is pressed
+    }
+  };
+
+  const handleSearch = (term) => {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set("name", term);
+    } else {
+      params.delete("name");
+    }
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    if (!term.trim()) {
+      setUsers(originalUsers.current);
+    } else {
+      const filteredUsers = originalUsers.current.filter((user) =>
+        user.name.toLowerCase().includes(term.toLowerCase())
+      );
+      setUsers(filteredUsers);
     }
   };
   return (
@@ -153,7 +178,7 @@ const Dashboard = () => {
             padding: "16px",
           }}
         >
-          {/* <TextField
+          <TextField
             variant="outlined"
             placeholder="Search"
             size="small"
@@ -165,21 +190,8 @@ const Dashboard = () => {
                 </IconButton>
               ),
             }}
-          /> */}
-          {/* Display online users
-          <Box sx={{ marginBottom: "16px" }}>
-            <Typography variant="h6" sx={{ marginBottom: "8px" }}>
-              Online Users
-            </Typography>
-            {onlineUsers.map((userId) => {
-              const user = users.find((user) => user._id === userId);
-              return user ? (
-                <Box key={user._id} sx={{ marginBottom: "8px" }}>
-                  {user.name} <span style={{ color: "green" }}>•</span>
-                </Box>
-              ) : null;
-            })}
-          </Box> */}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
 
           <Box sx={{ flex: 1, overflowY: "auto", marginBottom: "16px" }}>
             <Typography
@@ -191,9 +203,9 @@ const Dashboard = () => {
             <Conversation
               user={users}
               onUserClick={(user) => handleUserClick(user)}
+              onlineUsers={onlineUsers}
             />
           </Box>
-
           <Button variant="contained" color="error" fullWidth onClick={logout}>
             Logout
           </Button>

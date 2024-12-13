@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Typography, Avatar } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 const Message = ({ message }) => {
   const currentUser = JSON.parse(localStorage.getItem("chat-user"));
@@ -17,13 +17,13 @@ const Message = ({ message }) => {
             mb: "16px",
             textAlign: "left",
             alignSelf:
-              msg.senderId != currentUser._id ? "flex-start" : "flex-end",
+              msg.senderId !== currentUser._id ? "flex-start" : "flex-end",
             maxWidth: "70%",
             backgroundColor:
               msg.senderId === currentUser._id ? "#DCF8C6" : "#FFFFFF",
             padding: "8px 12px",
             borderRadius:
-              msg.senderId != currentUser._id
+              msg.senderId !== currentUser._id
                 ? "12px 12px 12px 0px "
                 : " 12px 12px 0px 12px",
             boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",

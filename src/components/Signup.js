@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import chatapp1 from "../images/chatapp1.jpg";
 import { Formik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
@@ -36,7 +36,7 @@ const Signup = () => {
       .oneOf([Yup.ref("password"), null], " Passwords must match"),
     gender: Yup.string().required("You need to select gender"),
   });
-  const [loading, setLoading] = useState(false);
+
   return (
     <Box
       sx={{
@@ -62,7 +62,6 @@ const Signup = () => {
           initialValues={initialValue}
           validationSchema={validation}
           onSubmit={async (values, { resetForm }) => {
-            setLoading(true);
             try {
               const res = await fetch("http://localhost:3005/auth/register", {
                 method: "POST",
@@ -80,8 +79,6 @@ const Signup = () => {
               resetForm();
             } catch (error) {
               alert("Error in Registering", error.message);
-            } finally {
-              setLoading(false);
             }
           }}
         >

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Formik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
@@ -7,7 +7,6 @@ import { TextField, Button, Box, Typography } from "@mui/material";
 
 const Signin = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const initialValue = {
     email: "",
@@ -43,7 +42,6 @@ const Signin = () => {
           initialValues={initialValue}
           validationSchema={validation}
           onSubmit={async (values, { resetForm }) => {
-            setLoading(true);
             try {
               const res = await fetch("http://localhost:3005/auth/login", {
                 method: "POST",
@@ -61,8 +59,6 @@ const Signin = () => {
               navigate("/user");
             } catch (error) {
               alert("Error in Login", error.message);
-            } finally {
-              setLoading(false);
             }
           }}
         >
@@ -156,7 +152,7 @@ const Signin = () => {
             justifyContent: "center",
           }}
         >
-          <img src={chatapp1} width="100%" height="100%"></img>
+          <img src={chatapp1} alt="chatapp" width="100%" height="100%"></img>
         </Box>
       </Box>
     </Box>
