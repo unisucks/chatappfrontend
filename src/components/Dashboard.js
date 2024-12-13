@@ -3,7 +3,7 @@ import { Box, Typography, TextField, Button, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Message from "./Message";
 import Conversation from "./Conversation";
-import { useNavigate } from "react-router-dom";
+import { isCookie, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import io from "socket.io-client";
 
@@ -17,7 +17,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (sender) {
-      const socket = io("http://192.168.0.49:3005", {
+      const socket = io("http://localhost:3005", {
         query: {
           userId: sender._id,
         },
@@ -53,13 +53,22 @@ const Dashboard = () => {
         setUsers(data);
       } catch (error) {
         alert("Error in Getting Users", error.message);
+        navigate("/");
       }
     };
     getConversations();
   }, []);
   const navigate = useNavigate();
-  const logout = (e) => {
+  const logout = async (e) => {
     e.preventDefault();
+    const res = await fetch("http://localhost:3005/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
     localStorage.removeItem("chat-user");
     navigate("/");
   };
